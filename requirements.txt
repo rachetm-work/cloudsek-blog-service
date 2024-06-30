@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+pydantic
+pika
+elasticsearch==7.17.6

@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+fastapi = "*"
+uvicorn = "*"
+pydantic = "*"
+pika = "*"
+pydantic-settings = "*"
+elasticsearch = "==7.17.6"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"

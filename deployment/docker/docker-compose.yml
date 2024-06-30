@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  blogging_service:
+    build: ../../.
+    ports:
+      - "8000:8000"
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - ELASTICSEARCH_HOST=elasticsearch
+    depends_on:
+      - rabbitmq
+      - elasticsearch
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  elasticsearch:
+    image: "elasticsearch:7.17.6"
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+
+  consumer:
+    build: ../../.
+    command: [ "python", "-m", "src.framework.consumers.consumer" ]
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - ELASTICSEARCH_HOST=elasticsearch
+    depends_on:
+      - rabbitmq
+      - elasticsearch

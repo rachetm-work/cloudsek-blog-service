@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blogging-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: blogging-service
+  template:
+    metadata:
+      labels:
+        app: blogging-service
+    spec:
+      containers:
+      - name: app
+        image: your_dockerhub_username/blogging-service:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: RABBITMQ_HOST
+          value: "rabbitmq"
+        - name: ELASTICSEARCH_HOST
+          value: "elasticsearch"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blogging-consumer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: blogging-consumer
+  template:
+    metadata:
+      labels:
+        app: blogging-consumer
+    spec:
+      containers:
+      - name: consumer
+        image: your_dockerhub_username/blogging-service:latest
+        command: ["python", "-m", "src.framework.consumers.consumer"]
+        env:
+        - name: RABBITMQ_HOST
+          value: "rabbitmq"
+        - name: ELASTICSEARCH_HOST
+          value: "elasticsearch"
