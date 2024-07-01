@@ -10,8 +10,10 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - ELASTICSEARCH_HOST=elasticsearch
     depends_on:
-      - rabbitmq
-      - elasticsearch
+      rabbitmq:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
 
   rabbitmq:
     container_name: rabbitmq-service
@@ -19,6 +21,11 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   elasticsearch:
     container_name: elasticsearch-service
@@ -27,6 +34,12 @@ services:
       - discovery.type=single-node
     ports:
       - "9200:9200"
+      - "9300:9300"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"' || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   consumer:
     container_name: consumer-service
@@ -36,5 +49,7 @@ services:
       - RABBITMQ_HOST=rabbitmq
       - ELASTICSEARCH_HOST=elasticsearch
     depends_on:
-      - rabbitmq
-      - elasticsearch
+      rabbitmq:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy

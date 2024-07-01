@@ -4,8 +4,6 @@ from src.framework.es.es_manager import ESManager
 from src.framework.producers.producer import publish_to_queue
 from src.framework.responses import ApiSuccessResponse
 
-_blogs_es_manager = ESManager(index_name_suffix='blogs')
-
 
 def submit_blog(blog_entry):
     entry_data = blog_entry.dict()
@@ -16,7 +14,7 @@ def submit_blog(blog_entry):
 
 
 def search_blogs(search_term: str):
-    data = _blogs_es_manager.get_search_results(query={
+    data = ESManager(index_name_suffix='blogs').get_search_results(query={
         "query": {
             "multi_match": {
                 "query": search_term,

@@ -8,6 +8,12 @@ app = FastAPI()
 
 app.include_router(router=blog_router, prefix=settings.base_url_prefix, tags=["blog"])
 
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
+
 # For local debugging purposes only
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

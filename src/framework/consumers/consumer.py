@@ -1,7 +1,9 @@
 import json
 import logging
+import time
 
 import pika
+from pika.exceptions import AMQPConnectionError
 
 from src.framework.es.es_manager import ESManager
 from src.framework.settings.settings import settings
@@ -9,6 +11,16 @@ from src.framework.settings.settings import settings
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+def connect_to_rabbitmq():
+    while True:
+        try:
+            connection = pika.BlockingConnection(pika.ConnectionParameters(host=settings.rabbitmq_host))
+            return connection
+        except AMQPConnectionError as e:
+            logger.error(f"Error connecting to RabbitMQ: {e}. Retrying in 5 seconds...")
+            time.sleep(5)
 
 
 def callback(ch, method, properties, body):
@@ -23,7 +35,7 @@ def callback(ch, method, properties, body):
 
 def consume_queue():
     try:
-        connection = pika.BlockingConnection(pika.ConnectionParameters(host=settings.rabbitmq_host, port=5672))
+        connection = connect_to_rabbitmq()
         channel = connection.channel()
         channel.queue_declare(queue='blog_queue')
         channel.basic_consume(queue='blog_queue', on_message_callback=callback, auto_ack=True)
