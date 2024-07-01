@@ -2,4 +2,5 @@ fastapi
 uvicorn
 pydantic
 pika
+pydantic-settings
 elasticsearch==7.17.6
