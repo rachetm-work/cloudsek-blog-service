@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   blogging_service:
+    container_name: blogging-service
     build: ../../.
     ports:
       - "8000:8000"
@@ -13,12 +14,14 @@ services:
       - elasticsearch
 
   rabbitmq:
+    container_name: rabbitmq-service
     image: "rabbitmq:3-management"
     ports:
       - "5672:5672"
       - "15672:15672"
 
   elasticsearch:
+    container_name: elasticsearch-service
     image: "elasticsearch:7.17.6"
     environment:
       - discovery.type=single-node
@@ -26,6 +29,7 @@ services:
       - "9200:9200"
 
   consumer:
+    container_name: consumer-service
     build: ../../.
     command: [ "python", "-m", "src.framework.consumers.consumer" ]
     environment:
